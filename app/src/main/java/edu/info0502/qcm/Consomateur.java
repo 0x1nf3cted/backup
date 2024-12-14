@@ -46,10 +46,10 @@ public class Consomateur {
             }
 
             ConnectionFactory usineConnexion = new ConnectionFactory();
-            usineConnexion.setHost("10.11.18.72");
+            usineConnexion.setHost("localhost");
             usineConnexion.setPort(5672);
-            usineConnexion.setUsername("consomateur");
-            usineConnexion.setPassword("consomateur");
+            usineConnexion.setUsername("guest");
+            usineConnexion.setPassword("guest");
 
             try (Connection connexion = usineConnexion.newConnection();
                  Channel canal = connexion.createChannel()) {
