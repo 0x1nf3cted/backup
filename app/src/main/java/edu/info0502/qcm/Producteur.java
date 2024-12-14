@@ -1,7 +1,14 @@
 package edu.info0502.qcm;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -10,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -22,10 +30,10 @@ public class Producteur {
 
     public static void main(String[] args) {
         ConnectionFactory usineConnexion = new ConnectionFactory();
-        usineConnexion.setHost("10.11.18.72");
+        usineConnexion.setHost("localhost");
         usineConnexion.setPort(5672);
-        usineConnexion.setUsername("producteur");
-        usineConnexion.setPassword("producteur");
+        usineConnexion.setUsername("guest");
+        usineConnexion.setPassword("guest");
 
         try (Connection connexion = usineConnexion.newConnection(); Channel canal = connexion.createChannel()) {
 
@@ -75,21 +83,16 @@ public class Producteur {
         return score;
     }
 }
-
 class GestionUtilisateurs {
 
-    private static final String FICHIER_UTILISATEURS = "src/main/resources/users.json";
+    private static final String FICHIER_UTILISATEURS = "users.json";
 
-    public static void ajouterUtilisateur(String nom, String motDePasse) {
+    public static synchronized void ajouterUtilisateur(String nom, String motDePasse) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<Map<String, String>> listeUtilisateurs = new ArrayList<>();
+            List<Map<String, String>> listeUtilisateurs = chargerUtilisateurs();
 
-            File fichier = new File(FICHIER_UTILISATEURS);
-            if (fichier.exists()) {
-                listeUtilisateurs = mapper.readValue(fichier, mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-            }
-
+            // Check if the username already exists
             for (Map<String, String> utilisateur : listeUtilisateurs) {
                 if (utilisateur.get("username").equals(nom)) {
                     System.out.println("Ce nom d'utilisateur est déjà pris.");
@@ -97,19 +100,21 @@ class GestionUtilisateurs {
                 }
             }
 
+            // Add the new user
             listeUtilisateurs.add(Map.of("username", nom, "password", motDePasse));
-            mapper.writeValue(fichier, listeUtilisateurs);
+            sauvegarderUtilisateurs(listeUtilisateurs);
             System.out.println("Inscription réussie !");
         } catch (IOException ex) {
             System.err.println("Erreur lors de l'enregistrement : " + ex.getMessage());
         }
     }
 
-    public static boolean validerConnexion(String nom, String motDePasse) {
+    public static synchronized boolean validerConnexion(String nom, String motDePasse) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<Map<String, String>> listeUtilisateurs = mapper.readValue(new File(FICHIER_UTILISATEURS), mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+            List<Map<String, String>> listeUtilisateurs = chargerUtilisateurs();
 
+            // Validate user credentials
             for (Map<String, String> utilisateur : listeUtilisateurs) {
                 if (utilisateur.get("username").equals(nom) && utilisateur.get("password").equals(motDePasse)) {
                     return true;
@@ -120,4 +125,40 @@ class GestionUtilisateurs {
         }
         return false;
     }
+
+    private static List<Map<String, String>> chargerUtilisateurs() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File fichier = new File(FICHIER_UTILISATEURS);
+
+        if (fichier.exists()) {
+            System.out.println("Chargement des utilisateurs depuis : " + fichier.getAbsolutePath());
+            try (Reader reader = new InputStreamReader(new FileInputStream(fichier), StandardCharsets.UTF_8)) {
+                return mapper.readValue(reader, mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+            } catch (MismatchedInputException e) {
+                System.err.println("Le fichier des utilisateurs est vide ou mal formé. Initialisation d'une liste vide.");
+                return new ArrayList<>();
+            }
+        } else {
+            System.out.println("Fichier des utilisateurs introuvable. Initialisation d'une liste vide.");
+            return new ArrayList<>();
+        }
+    }
+
+    private static void sauvegarderUtilisateurs(List<Map<String, String>> listeUtilisateurs) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File fichier = new File(FICHIER_UTILISATEURS);
+
+        // Ensure the parent directory exists
+        File parentDir = fichier.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
+        // Write the user list to the file in UTF-8
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(fichier), StandardCharsets.UTF_8)) {
+            mapper.writeValue(writer, listeUtilisateurs);
+        }
+    }
+
+
 }
