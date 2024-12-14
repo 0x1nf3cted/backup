@@ -24,8 +24,8 @@ public class Producteur {
         ConnectionFactory usineConnexion = new ConnectionFactory();
         usineConnexion.setHost("10.11.18.72");
         usineConnexion.setPort(5672);
-        usineConnexion.setUsername("guest");
-        usineConnexion.setPassword("guest");
+        usineConnexion.setUsername("producteur");
+        usineConnexion.setPassword("producteur");
 
         try (Connection connexion = usineConnexion.newConnection(); Channel canal = connexion.createChannel()) {
 
