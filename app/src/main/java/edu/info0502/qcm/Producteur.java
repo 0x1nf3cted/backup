@@ -22,7 +22,7 @@ public class Producteur {
 
     public static void main(String[] args) {
         ConnectionFactory usineConnexion = new ConnectionFactory();
-        usineConnexion.setHost("localhost");
+        usineConnexion.setHost("10.11.18.72");
         usineConnexion.setPort(5672);
         usineConnexion.setUsername("guest");
         usineConnexion.setPassword("guest");
