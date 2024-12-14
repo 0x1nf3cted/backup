@@ -1,34 +1,36 @@
 {
-  "id": "java101",
-  "title": "Java Programming Basics",
-  "description": "description",
-  "questions": [
-      {
-          "id": "q1",
-          "text": "What is the entry point of a Java program?",
-          "options": ["public void main", "public static void main", "static void main"],
-          "correctAnswer": 2,
-          "points": 2,
-          "explanation": "true"
-      },
-      {
-          "id": "q2",
-          "text": "Which keyword is used to create a class?",
-          "options": ["struct", "class", "object"],
-          "correctAnswer": 2,
-          "points": 2,
-          "explanation": "true"
-      },
-      {
-          "id": "q3",
-          "text": "Which collection cannot contain duplicate elements?",
-          "options": ["List", "Set", "Map"],
-          "correctAnswer": 2,
-          "points": 2,
-          "explanation": "true"
-      }
-  ],
-  "timeLimit": 30,
-  "creationDate": "2023-02-20T14:30:00.000Z"
-
+    "qcm_id": "98765",
+    "title": "Culture Générale - Niveau Débutant",
+    "questions": [
+        {
+            "question_id": "q1",
+            "text": "Quelle est la capitale de la France ?",
+            "choices": ["Berlin", "Madrid", "Paris", "Rome"],
+            "correct_choice": 3
+        },
+        {
+            "question_id": "q2",
+            "text": "Combien de continents y a-t-il sur Terre ?",
+            "choices": ["5", "6", "7", "8"],
+            "correct_choice": 3
+        },
+        {
+            "question_id": "q3",
+            "text": "Quel est l'élément chimique représenté par le symbole 'O' ?",
+            "choices": ["Oxygène", "Or", "Osmium", "Oganesson"],
+            "correct_choice": 1
+        },
+        {
+            "question_id": "q4",
+            "text": "En quelle année l'homme a-t-il marché sur la Lune pour la première fois ?",
+            "choices": ["1965", "1969", "1971", "1980"],
+            "correct_choice": 2
+        },
+        {
+            "question_id": "q5",
+            "text": "Quelle est la plus grande planète du système solaire ?",
+            "choices": ["Terre", "Saturne", "Jupiter", "Neptune"],
+            "correct_choice": 3
+        }
+    ]
 }
