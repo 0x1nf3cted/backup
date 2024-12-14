@@ -61,5 +61,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'edu.info0502.qcm.Server'
+    mainClass = 'edu.info0502.qcm.Producteur'
 }
